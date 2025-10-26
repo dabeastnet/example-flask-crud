@@ -24,5 +24,10 @@ EXPOSE 80
 # If no migrations are present or the database is empty, the upgrade command will no-op.
 # Note: DATABASE_URL must be provided at runtime via the ECS task definition.
 # Optional: only run migrations when RUN_MIGRATIONS=true
-CMD bash -lc '[ "${RUN_MIGRATIONS:-false}" != "true" ] || flask db upgrade || true; \
-  exec gunicorn -w ${GUNICORN_WORKERS:-4} -b 0.0.0.0:80 --access-logfile=- --error-logfile=- wsgi:app'
+# CMD bash -lc '[ "${RUN_MIGRATIONS:-false}" != "true" ] || flask db upgrade || true; \
+#   exec gunicorn -w ${GUNICORN_WORKERS:-4} -b 0.0.0.0:80 --access-logfile=- --error-logfile=- wsgi:app'
+CMD ["bash","-lc","\
+if [ \"${RUN_MIGRATIONS:-false}\" = true ]; then \
+  if [ -d migrations ]; then flask db upgrade; else echo 'No migrations/ folder; skipping upgrade'; fi; \
+fi; \
+exec gunicorn -w ${GUNICORN_WORKERS:-4} -b 0.0.0.0:80 --access-logfile=- --error-logfile=- wsgi:app"]
