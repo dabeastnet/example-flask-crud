@@ -86,6 +86,12 @@ def turn(id):
 
     return "of the jedi"
 
+# Health check for proxy
+@app.get("/health")
+def health():
+    return {"status": "ok"}, 200
+
+
 # @app.errorhandler(Exception)
 # def error_page(e):
 #     return "of the jedi"
